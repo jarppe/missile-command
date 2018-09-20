@@ -42,4 +42,4 @@
   (reset-ctx!)
   (animation 0))
 
-(js/console.log "Here we go again...")
+(js/console.log "Game running...")
