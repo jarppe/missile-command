@@ -3,14 +3,22 @@
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/style.css" rel="stylesheet" type="text/css">
     <link rel="icon" href="https://clojurescript.org/images/cljs-logo-icon-32.png">
+    <title>Missile Command</title>
+    <style>
+      html, body, #app {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: #1d1d1d;
+      }
+    </style>
   </head>
   <body>
-    <div id="app">
-      <h2>Figwheel template</h2>
-      <p>Checkout your developer console.</p>
-    </div>
-    <script src="js/compiled/missile_command.js" type="text/javascript"></script>
+    <canvas id="app"></canvas>
+    <script src="app.js"></script>
   </body>
 </html>
