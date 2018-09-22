@@ -14,8 +14,7 @@
                 :cities    {:a (make-city 100)
                             :s (make-city 400)
                             :d (make-city 700)}
-                :run       true
-                :debug?    true}))
+                :run       true}))
 
 (defn pause [state]
   (update state :run not))

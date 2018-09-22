@@ -9,7 +9,7 @@
 (def ^:const city-y 430)
 
 (def ^:const pointer-style "#3f3")
-(def ^:const defending-style "#aaa")
+(def ^:const defending-style "#555")
 
 (defn clear [g]
   (doto g

@@ -64,8 +64,9 @@
     (.addEventListener "mousemove" mouse-move!)
     (.addEventListener "mouseleave" mouse-leave!))
   (reset! state (-> {}
-                    reset-graph-ctx
-                    g/reset-game-state))
+                    (reset-graph-ctx)
+                    (g/reset-game-state)
+                    (assoc :debug? false)))
   (animation 0))
 
 (js/console.log "Game running...")
