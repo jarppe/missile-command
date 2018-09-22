@@ -72,17 +72,4 @@
       (update :defenders update-defenders ts)))
 
 (defn mouse-move [state x y]
-  (let [x1 400
-        y1 450
-        x2 x
-        y2 y
-        a  (angle x1 y1 x2 y2)
-        vx (* (Math/cos a) defending-v)
-        vy (* (Math/sin a) defending-v)
-        x2 (+ x1 (* vx 10))
-        y2 (+ y1 (* vy 10))]
-    (assoc state :x x, :y y
-                 :foo-x1 x1
-                 :foo-y1 y1
-                 :foo-x2 x2
-                 :foo-y2 y2)))
+  (assoc state :x x, :y y))

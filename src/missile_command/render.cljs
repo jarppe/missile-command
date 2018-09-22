@@ -62,10 +62,6 @@
     (clear)
     (pointer (:x state) (:y state))
     (defenders (:defenders state))
-    (debug state)
-    (.beginPath)
-    (.moveTo (-> state :foo-x1) (-> state :foo-y1))
-    (.lineTo (-> state :foo-x2) (-> state :foo-y2))
-    (.stroke))
+    (debug state))
   state)
 
