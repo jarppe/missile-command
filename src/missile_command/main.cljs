@@ -1,45 +1,71 @@
 (ns missile-command.main
-  (:require [missile-command.render :as r]))
+  (:require [missile-command.render :as r]
+            [missile-command.game :as g]))
 
-(defonce ctx (atom nil))
+(defonce state (atom nil))
 
-(defn initial-ctx [g w h]
-  (let [r     (Math/min (/ w 8.0) (/ h 3.0))
-        off-x (/ (- w (* r 8.0)) 2.0)
-        off-y (/ (- h (* r 3.0)) 2.0)
-        size  (* (/ r 2.0) 0.94)]
-    (js/console.log "init:"
-                    "w:" w
-                    "h:" h
-                    "r:" r
-                    "off-x:" off-x
-                    "off-y:" off-y
-                    "size:" size)
-    {:g     g
-     :w     w
-     :h     h
-     :off-x off-x
-     :off-y off-y
-     :r     r
-     :size  size}))
+(defn reset-graph-ctx [state]
+  (let [c (js/document.getElementById "main")
+        w (.-clientWidth c)
+        h (.-clientHeight c)
+        g (.getContext c "2d")]
+    (doto c
+      (-> .-width (set! w))
+      (-> .-height (set! h)))
+    (doto g
+      (.scale (/ w r/width) (/ h r/height)))
+    (assoc state :g g :w w :h h)))
 
-(defn reset-ctx! []
-  (let [canvas (js/document.getElementById "app")
-        g      (.getContext canvas "2d")
-        width  (.-clientWidth canvas)
-        height (.-clientHeight canvas)]
-    (doto canvas
-      (-> .-width (set! width))
-      (-> .-height (set! height)))
-    (swap! ctx merge (initial-ctx g width height))))
+(def key-handlers {"KeyA"   (fn [_] (swap! state g/fire :a))
+                   "KeyS"   (fn [_] (swap! state g/fire :s))
+                   "KeyD"   (fn [_] (swap! state g/fire :d))
+                   "Space"  (fn [_] (swap! state g/pause))
+                   "Escape" (fn [_] (swap! state g/exit))
+                   "F1"     (fn [_] (swap! state update :debug? not))})
 
-(defn animation [_]
-  (swap! ctx r/render)
+(defn keydown! [e]
+  (js/console.log (-> e .-code))
+  (when-let [handler (-> e .-code key-handlers)]
+    (.preventDefault e)
+    (when-not (-> e .-repeat)
+      (handler e))))
+
+(defn mouse-move! [e]
+  (let [s  @state
+        w  (:w s)
+        h  (:h s)
+        cx (-> e .-clientX)
+        cy (-> e .-clientY)
+        x  (* cx (/ r/width w))
+        y  (* cy (/ r/height h))]
+    (swap! state g/mouse-move x y)))
+
+(defn mouse-leave! [_]
+  (swap! state g/mouse-move nil nil))
+
+(defn resize! [_]
+  (swap! state reset-graph-ctx))
+
+(defn game-step [state ts]
+  (-> state
+      (g/game-step ts)
+      (r/render)))
+
+(defn animation [ts]
+  (swap! state game-step ts)
   (js/window.requestAnimationFrame animation))
 
-(when-not @ctx
-  (.addEventListener js/window "resize" reset-ctx!)
-  (reset-ctx!)
+(when-not @state
+  (js/console.log "Initializing game...")
+  (doto js/window
+    (.addEventListener "resize" resize!)
+    (.addEventListener "keydown" keydown!))
+  (doto (js/document.getElementById "main")
+    (.addEventListener "mousemove" mouse-move!)
+    (.addEventListener "mouseleave" mouse-leave!))
+  (reset! state (-> {}
+                    reset-graph-ctx
+                    g/reset-game-state))
   (animation 0))
 
 (js/console.log "Game running...")

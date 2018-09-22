@@ -17,13 +17,13 @@
                         :figwheel     {:websocket-host :js-client-host}
                         :compiler     {:main                 missile-command.main
                                        :asset-path           "js"
-                                       :output-to            "target/dev/resources/public/app.js"
+                                       :output-to            "target/dev/resources/public/game.js"
                                        :output-dir           "target/dev/resources/public/js"
                                        :source-map-timestamp true
                                        :preloads             [devtools.preload]}}
                        {:id           "prod"
                         :source-paths ["src"]
-                        :compiler     {:output-to     "docs/app.js"
+                        :compiler     {:output-to     "docs/game.js"
                                        :main          missile-command.main
                                        :optimizations :advanced
                                        :pretty-print  false}}]}
