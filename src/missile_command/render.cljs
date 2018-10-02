@@ -9,7 +9,8 @@
 (def ^:const city-y 430)
 
 (def ^:const pointer-style "#3f3")
-(def ^:const defending-style "#555")
+(def ^:const defender-style "#555")
+(def ^:const offender-style "#a33")
 
 (defn clear [g]
   (doto g
@@ -23,16 +24,21 @@
       (.ellipse x y 10 10 0 0 PIx2 true)
       (.stroke))))
 
-(defn defenders [g defenders]
+(defn render-missile [g {:keys [style x1 y1 x2 y2]}]
   (doto g
-    (-> .-strokeStyle (set! defending-style))
-    (.beginPath))
-  (doseq [defender defenders]
-    (doto g
-      (.moveTo (-> defender :x1) (-> defender :y1))
-      (.lineTo (-> defender :x2) (-> defender :y2))))
-  (doto g
+    (-> .-strokeStyle (set! style))
+    (.beginPath)
+    (.moveTo x1 y1)
+    (.lineTo x2 y2)
     (.stroke)))
+
+(def element-renderer {:defender render-missile
+                       :offender render-missile})
+
+(defn render-elements [g elements]
+  (doseq [element elements
+          :let [renderer (-> element :type element-renderer)]]
+    (renderer g element)))
 
 (defn state->debug [state]
   (concat ["Cities:"]
@@ -40,14 +46,13 @@
                                     (str "  " id ": "
                                          "m: " missiles " "
                                          "d: " damage))))
-          [(str "Defenders (" (-> state :defenders count) "):")]
-          (->> state :defenders (map (fn [{:keys [x1 y1 x2 y2 top]}]
-                                       (str "  "
-                                            (.toFixed x1 0) " "
-                                            (.toFixed y1 0) " -> "
-                                            (.toFixed x2 0) " "
-                                            (.toFixed y2 0) " "
-                                            "top: " (.toFixed top)))))))
+          [(str "Elements (" (-> state :elements count) "):")]
+          (->> state :elements (map (fn [{:keys [type x1 y1 x2 y2]}]
+                                      (str "  " type ": "
+                                           (.toFixed x1 0) " "
+                                           (.toFixed y1 0) " -> "
+                                           (.toFixed x2 0) " "
+                                           (.toFixed y2 0)))))))
 
 (defn debug [g state]
   (when (-> state :debug?)
@@ -61,7 +66,7 @@
   (doto (:g state)
     (clear)
     (pointer (:x state) (:y state))
-    (defenders (:defenders state))
+    (render-elements (:elements state))
     (debug state))
   state)
 
